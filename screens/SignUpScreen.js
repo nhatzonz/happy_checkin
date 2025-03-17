@@ -2,12 +2,27 @@ import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'reac
 import ImgLogo from '../assets/logo2-removebg-preview.png';
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 import { useState } from 'react';
+import axios from 'axios';
 
-export default function SignUpScreen({ navigation }) {
+export default function SignUpScreen({ navigation, route }) {
     const [text, setText] = useState('');
-    function handleFinish() {
-        if (text.length < 1) alert('vui lòng nhập tên !');
-        else navigation.navigate('Success', { name: text });
+    const { phone } = route.params;
+    console.log(text);
+
+    async function handleFinish() {
+        if (text.trim() === '') {
+            alert('Tên không được để trống!');
+            return;
+        }
+        try {
+            const { data } = await axios.post('http://localhost:5000/api/customers/signup', {
+                phone,
+                text,
+            });
+            navigation.navigate('Success', { phone });
+        } catch (err) {
+            console.log('Lỗi kết nối server!', err);
+        }
     }
 
     return (
@@ -23,7 +38,7 @@ export default function SignUpScreen({ navigation }) {
                     style={styles.input}
                     placeholder="Nhập tên của bạn ..."
                     value={text}
-                    onChangeText={(e) => setText(e)}
+                    onChangeText={setText}
                     keyboardType="default"
                 />
             </View>

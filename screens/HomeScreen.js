@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
 import ImgLogo from '../assets/logo2-removebg-preview.png';
 import { useState } from 'react';
+import axios from 'axios';
 
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 
@@ -17,9 +18,20 @@ export default function HomeScreen({ navigation }) {
         setPhone(phone.slice(0, -1));
     }
 
-    function handleSubmit() {
+    async function handleSubmit() {
         if (phone.length < 10) alert('số điện thoại chưa đủ 10 ký tự');
-        else navigation.navigate('SignUp');
+        try {
+            const { data } = await axios.get(`http://localhost:5000/api/checkins/${phone}`);
+
+            if (data.exists) {
+                navigation.navigate('Success', { phone });
+            } else {
+                navigation.navigate('SignUp', { phone });
+            }
+        } catch (error) {
+            console.error('❌ Lỗi API:', error);
+            alert('Lỗi kết nối đến server!');
+        }
     }
 
     return (

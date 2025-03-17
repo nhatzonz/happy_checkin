@@ -1,10 +1,26 @@
+import axios from 'axios';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import ImgLogo from '../assets/logo2-removebg-preview.png';
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
+import { useState } from 'react';
 
 export default function LoginScreen({ navigation }) {
-    function handleLogin() {
-        navigation.navigate('Home');
+    const [userName, setUserName] = useState('');
+    const [passWord, setPassWord] = useState('');
+    const [error, setError] = useState('');
+
+    async function handleLogin() {
+        setError('');
+        try {
+            const { data } = await axios.post('http://localhost:5000/api/users/login', {
+                userName,
+                passWord,
+            });
+            // console.log(' Token nhận được:', data.token);
+            navigation.navigate('Home');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Lỗi kết nối đến server!');
+        }
     }
     return (
         <BackgroundWrapper>
@@ -19,8 +35,23 @@ export default function LoginScreen({ navigation }) {
                     <Text style={styles.website}>happy-shopper.com</Text>
                 </View>
 
-                <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#888" />
-                <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Username"
+                    placeholderTextColor="#888"
+                    value={userName}
+                    onChangeText={setUserName}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    placeholderTextColor="#888"
+                    secureTextEntry
+                    value={passWord}
+                    onChangeText={setPassWord}
+                />
+
+                {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
                 <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
                     <Text style={styles.buttonText}>Login</Text>

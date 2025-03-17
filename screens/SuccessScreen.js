@@ -1,11 +1,32 @@
 import { StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { Svg, Circle, Path } from 'react-native-svg';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 
 export default function SuccessScreen({ route }) {
-    const { name } = route.params;
-    console.log(name);
+    const { phone } = route.params;
+    const [customer, setCustomer] = useState(null);
+    const [point, setPoint] = useState(0);
+
+    useEffect(() => {
+        async function handleCheckin() {
+            try {
+                await axios.post('http://localhost:5000/api/checkins/checkin', { phone });
+
+                const { data } = await axios.get(`http://localhost:5000/api/customers/${phone}`);
+                // console.log(data.name, data.point);
+
+                setCustomer(data.name);
+                setPoint(data.point);
+            } catch (error) {
+                console.error(' Lỗi check-in:', error.response?.data?.message || error.message);
+            }
+        }
+
+        handleCheckin();
+    }, [phone]);
 
     return (
         <BackgroundWrapper>
@@ -23,17 +44,14 @@ export default function SuccessScreen({ route }) {
                 </Svg>
             </View>
 
-            {/* Text */}
             <Text style={styles.thankText}>Thank you!</Text>
-            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.name}>{customer}</Text>
             <Text style={styles.checkinText}>Bạn đã checkin thành công!</Text>
 
-            {/* Line */}
             <View style={styles.line} />
 
-            {/* Point Display */}
             <Text style={styles.currentPoint}>Điểm hiện của bạn là</Text>
-            <Text style={styles.points}>0 Pts</Text>
+            <Text style={styles.points}>{point} Pts</Text>
         </BackgroundWrapper>
     );
 }
