@@ -3,8 +3,11 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackgr
 import ImgLogo from '../assets/logo2-removebg-preview.png';
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LoginScreen({ navigation }) {
+import { API_URL } from '../config/config';
+
+export default function LoginScreen({ navigation, setIsLoggedIn }) {
     const [userName, setUserName] = useState('');
     const [passWord, setPassWord] = useState('');
     const [error, setError] = useState('');
@@ -12,12 +15,19 @@ export default function LoginScreen({ navigation }) {
     async function handleLogin() {
         setError('');
         try {
-            const { data } = await axios.post('http://localhost:5000/api/users/login', {
+            const { data } = await axios.post(`${API_URL}/api/users/login`, {
                 userName,
                 passWord,
             });
-            // console.log(' Token nhận được:', data.token);
+            // console.log(' Token nhận được:', data);
+            const loginData = {
+                user: data.user,
+                loginTime: Date.now(),
+            };
+            await AsyncStorage.setItem('user', JSON.stringify(loginData));
             navigation.navigate('Home');
+            console.log('📦 Lưu user vào AsyncStorage thành công!');
+            setIsLoggedIn(true);
         } catch (err) {
             setError(err.response?.data?.message || 'Lỗi kết nối đến server!');
         }

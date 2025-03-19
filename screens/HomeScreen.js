@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Button } from 'react-native';
 import ImgLogo from '../assets/logo2-removebg-preview.png';
 import { useState } from 'react';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../config/config';
 
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, setIsLoggedIn }) {
     const [phone, setPhone] = useState('');
 
     function handlePress(num) {
@@ -18,10 +20,26 @@ export default function HomeScreen({ navigation }) {
         setPhone(phone.slice(0, -1));
     }
 
-    async function handleSubmit() {
-        if (phone.length < 10) alert('số điện thoại chưa đủ 10 ký tự');
+    const handleLogout = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/checkins/${phone}`);
+            await AsyncStorage.removeItem('user');
+            setIsLoggedIn(false);
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        } catch (error) {
+            console.error('❌ Lỗi khi logout:', error);
+        }
+    };
+
+    async function handleSubmit() {
+        if (phone.length < 10) {
+            alert('số điện thoại chưa đủ 10 ký tự');
+            return;
+        }
+        try {
+            const { data } = await axios.get(`${API_URL}/api/checkins/${phone}`);
 
             if (data.exists) {
                 navigation.navigate('Success', { phone });
@@ -36,6 +54,9 @@ export default function HomeScreen({ navigation }) {
 
     return (
         <BackgroundWrapper>
+            <TouchableOpacity onPress={() => handleLogout()} style={styles.btnLogout}>
+                <Text style={styles.btnLogoutTitle}>Logout</Text>
+            </TouchableOpacity>
             <View style={styles.logo}>
                 <Image source={ImgLogo} style={styles.logoImage} />
                 <Text style={styles.titleLogo}>HappyCheckin</Text>
@@ -76,6 +97,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         position: 'relative',
+    },
+    btnLogout: {
+        position: 'absolute',
+        top: 34,
+        right: 30,
+        backgroundColor: '#007bff',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    btnLogoutTitle: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     title: {
         color: 'red',

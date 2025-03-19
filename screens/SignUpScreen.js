@@ -3,11 +3,11 @@ import ImgLogo from '../assets/logo2-removebg-preview.png';
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 import { useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config/config';
 
 export default function SignUpScreen({ navigation, route }) {
     const [text, setText] = useState('');
     const { phone } = route.params;
-    console.log(text);
 
     async function handleFinish() {
         if (text.trim() === '') {
@@ -15,7 +15,7 @@ export default function SignUpScreen({ navigation, route }) {
             return;
         }
         try {
-            const { data } = await axios.post('http://localhost:5000/api/customers/signup', {
+            const { data } = await axios.post(`${API_URL}/api/customers/signup`, {
                 phone,
                 text,
             });

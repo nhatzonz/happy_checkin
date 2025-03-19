@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Svg, Circle, Path } from 'react-native-svg';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
+import { API_URL } from '../config/config';
+
 import BackgroundWrapper from '../BackgroundWrapper/BackgroundWrapper';
 
-export default function SuccessScreen({ route }) {
+export default function SuccessScreen({ route, navigation }) {
     const { phone } = route.params;
     const [customer, setCustomer] = useState(null);
     const [point, setPoint] = useState(0);
@@ -13,9 +15,9 @@ export default function SuccessScreen({ route }) {
     useEffect(() => {
         async function handleCheckin() {
             try {
-                await axios.post('http://localhost:5000/api/checkins/checkin', { phone });
+                await axios.post(`${API_URL}/api/checkins/checkin`, { phone });
 
-                const { data } = await axios.get(`http://localhost:5000/api/customers/${phone}`);
+                const { data } = await axios.get(`${API_URL}/api/customers/${phone}`);
                 // console.log(data.name, data.point);
 
                 setCustomer(data.name);
@@ -26,6 +28,14 @@ export default function SuccessScreen({ route }) {
         }
 
         handleCheckin();
+
+        const timeout = setTimeout(() => {
+            navigation.replace('Home'); //  Quay về Home
+        }, 6000);
+
+        return () => {
+            clearTimeout(timeout);
+        };
     }, [phone]);
 
     return (
