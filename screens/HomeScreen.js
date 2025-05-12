@@ -38,13 +38,16 @@ export default function HomeScreen({ navigation, setIsLoggedIn }) {
             alert('số điện thoại chưa đủ 10 ký tự');
             return;
         }
-        try {
-            const { data } = await axios.get(`${API_URL}/api/checkins/${phone}`);
+        console.log('hello');
 
-            if (data.exists) {
-                navigation.navigate('Success', { phone });
-            } else {
+        try {
+            const { data } = await axios.get(`${API_URL}/customers/${phone}`);
+            console.log(data);
+
+            if (data.error) {
                 navigation.navigate('SignUp', { phone });
+            } else {
+                navigation.navigate('Success', { phone });
             }
         } catch (error) {
             console.error('❌ Lỗi API:', error);

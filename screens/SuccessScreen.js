@@ -15,22 +15,23 @@ export default function SuccessScreen({ route, navigation }) {
     useEffect(() => {
         async function handleCheckin() {
             try {
-                await axios.post(`${API_URL}/api/checkins/checkin`, { phone });
+                await axios.post(`${API_URL}/customers/checkin`, { phone });
 
-                const { data } = await axios.get(`${API_URL}/api/customers/${phone}`);
-                // console.log(data.name, data.point);
+                const { data } = await axios.get(`${API_URL}/customers/${phone}`);
+                console.log('xxxx', data);
 
-                setCustomer(data.name);
-                setPoint(data.point);
+                setCustomer(data?.customer?.name);
+                setPoint(data?.customer?.point);
             } catch (error) {
                 console.error(' Lỗi check-in:', error.response?.data?.message || error.message);
             }
         }
+        console.log('yyyy:', customer);
 
         handleCheckin();
 
         const timeout = setTimeout(() => {
-            navigation.replace('Home'); //  Quay về Home
+            navigation.replace('Home');
         }, 6000);
 
         return () => {

@@ -15,11 +15,10 @@ export default function LoginScreen({ navigation, setIsLoggedIn }) {
     async function handleLogin() {
         setError('');
         try {
-            const { data } = await axios.post(`${API_URL}/api/users/login`, {
+            const { data } = await axios.post(`${API_URL}/auth/login`, {
                 userName,
                 passWord,
             });
-            // console.log(' Token nhận được:', data);
             const loginData = {
                 user: data.user,
                 loginTime: Date.now(),

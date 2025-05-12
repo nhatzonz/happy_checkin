@@ -15,9 +15,9 @@ export default function SignUpScreen({ navigation, route }) {
             return;
         }
         try {
-            const { data } = await axios.post(`${API_URL}/api/customers/signup`, {
+            await axios.post(`${API_URL}/customers/create`, {
                 phone,
-                text,
+                name: text,
             });
             navigation.navigate('Success', { phone });
         } catch (err) {
